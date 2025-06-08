@@ -1,12 +1,13 @@
 /*
 Copyright © 2025 René Kuhn renekuhn@posteo.de
-
 */
 package cmd
 
 import (
 	"fmt"
 	"os"
+
+	"github.com/leonaresearch/podstudio/internal/screenreader"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,7 +19,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "podstudio",
 	Short: "Accessible podcast recording and management CLI",
-	PodStudio is a command-line tool designed for accessible podcast production.
+	Long: `PodStudio is a command-line tool designed for accessible podcast production.
 Built specifically for blind and non-tech-savvy users, PodStudio provides:
 
 - Simple recording control with audio feedback
@@ -37,9 +38,10 @@ PodStudio makes professional podcast recording accessible to everyone,
 with clear audio feedback and simple commands that work great with
 screen readers and assistive technology.`,
 }
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+
+// Uncomment the following line if your bare application
+// has an action associated with it:
+// Run: func(cmd *cobra.Command, args []string) { },
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -76,6 +78,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".thomas" (without extension).
 		viper.AddConfigPath(home)
+		viper.AddConfigPath(".")
 		viper.SetConfigType("toml") // Set the config file type to toml
 		viper.SetConfigName(".podstudio")
 	}
@@ -86,4 +89,6 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+	// Initialize screen reader
+	screenreader.InitSpeech()
 }
