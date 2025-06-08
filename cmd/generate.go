@@ -75,13 +75,34 @@ func printAudioInputDevices() {
 		options[i] = huh.NewOption(label, device.Name)
 		deviceMap[device.Name] = device
 	}
-
+	var selectedSampleRate int
+	var selectedFormat string
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("Select an audio input device").
 				Options(options...).
 				Value(&selectedName),
+			// add sample rate selection
+			huh.NewSelect[int]().
+				Title("Select sample rate").
+				Options(
+					huh.NewOption("48000 Hz", 48000),
+					huh.NewOption("96000 Hz", 96000),
+					huh.NewOption("192000 Hz", 192000),
+					huh.NewOption("384000 Hz", 384000),
+				).
+				Value(&selectedSampleRate),
+			// add format selection
+			huh.NewSelect[string]().
+				Title("Select audio format").
+				Options(
+					huh.NewOption("WAV", "wav"),
+					huh.NewOption("FLAC", "flac"),
+					huh.NewOption("MP3", "mp3"),
+					huh.NewOption("OGG", "ogg"),
+				).
+				Value(&selectedFormat),
 		),
 	)
 
@@ -102,6 +123,8 @@ func printAudioInputDevices() {
 	viper.Set("inputDevice.card", selectedDevice.Card)
 	viper.Set("inputDevice.device", selectedDevice.Device)
 	viper.Set("inputDevice.description", selectedDevice.Description)
+	viper.Set("recording.sampleRate", selectedSampleRate)
+	viper.Set("recording.format", selectedFormat)
 
 	err = viper.WriteConfigAs(".podstudio.toml")
 	if err != nil {

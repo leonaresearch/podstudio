@@ -35,7 +35,14 @@ to quickly create a Cobra application.`,
 
 		fmt.Println("Available eSpeak voices:")
 		for _, voice := range voices {
-			fmt.Printf("- %s (%s)\n", voice.Name, voice.Languages)
+			langs := ""
+			for i, lang := range voice.Languages {
+				if i > 0 {
+					langs += ", "
+				}
+				langs += fmt.Sprintf("%v", lang)
+			}
+			fmt.Printf("- %s (%s)\n", voice.Name, langs)
 		}
 
 	},
