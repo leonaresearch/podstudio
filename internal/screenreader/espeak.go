@@ -85,3 +85,5 @@ func SayLine(text string) {
 		fmt.Printf("aplay error: %v\n", err)
 	}
 }
+
+

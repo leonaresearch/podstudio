@@ -23,19 +23,19 @@ func getRecorder() *Recorder {
 	return recorderInstance
 }
 
-func StartRecording(device InputDevice, sampleRate int, outputFile string) error {
+func StartRecording(device AudioSource, sampleRate int, outputFile string) error {
 	r := getRecorder()
 	if r.active {
 		return fmt.Errorf("recording already in progress")
 	}
-	if device.Description == "" {
+	if device.Name == "" {
 		return fmt.Errorf("invalid audio device: %v", device)
 	}
 	// Use parecord instead of arecord, with PulseAudio options
 	cmd := exec.Command("parecord",
-		"--device", device.Description, // Use the symbolic name or description as PulseAudio source
+		"--device", device.Name, // Use the symbolic name or description as PulseAudio source
 		"--rate", fmt.Sprintf("%d", sampleRate),
-		"--channels", "2",
+		"--channels", "1",
 		"--format", "s16le",
 		outputFile,
 	)
@@ -85,6 +85,12 @@ func StartRecording(device InputDevice, sampleRate int, outputFile string) error
 	}()
 
 	r.active = true
+	// play sounds/recording-start-sound.wav
+	cmd = exec.Command("paplay", "sounds/recording-start-sound.wav")
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Warning: Failed to play start sound: %v\n", err)
+	}
+
 	return nil
 }
 
@@ -92,6 +98,11 @@ func StopRecording() error {
 	r := getRecorder()
 	if !r.active || r.cmd == nil || r.cmd.Process == nil {
 		return fmt.Errorf("no active recording to stop")
+	}
+	// play sounds/recording-end-sound.wav
+	cmd := exec.Command("paplay", "sounds/recording-end-sound.wav")
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Warning: Failed to play end sound: %v\n", err)
 	}
 	err := r.cmd.Process.Kill()
 	if err != nil {

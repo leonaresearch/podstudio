@@ -1,9 +1,7 @@
 [inputdevice]
-card = 0
-description = 'USB Audio [USB Audio]'
-device = 0
-name = 'Device [USB PnP Audio Device]'
+index = 56
+name = 'alsa_input.usb-0c76_USB_PnP_Audio_Device-00.mono-fallback'
 
 [recording]
-format = 'mp3'
+format = 'wav'
 samplerate = 48000
