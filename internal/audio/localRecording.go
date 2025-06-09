@@ -31,17 +31,59 @@ func StartRecording(device InputDevice, sampleRate int, outputFile string) error
 	if device.Description == "" {
 		return fmt.Errorf("invalid audio device: %v", device)
 	}
-	cmd := exec.Command("arecord",
-		"-D", fmt.Sprintf("hw:%d,%d", device.Card, device.Device),
-		"-f", "S16_LE",
-		"-r", fmt.Sprintf("%d", sampleRate),
+	// Use parecord instead of arecord, with PulseAudio options
+	cmd := exec.Command("parecord",
+		"--device", device.Description, // Use the symbolic name or description as PulseAudio source
+		"--rate", fmt.Sprintf("%d", sampleRate),
+		"--channels", "2",
+		"--format", "s16le",
 		outputFile,
 	)
 	r.cmd = cmd
-	err := cmd.Start()
+
+	// Capture stdout and stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stdout: %v", err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stderr: %v", err)
+	}
+
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("Started recording process with PID: %d\n", cmd.Process.Pid)
+
+	// Print logs from stdout and stderr
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := stdout.Read(buf)
+			if n > 0 {
+				fmt.Printf("[parecord stdout] %s", string(buf[:n]))
+			}
+			if err != nil {
+				break
+			}
+		}
+	}()
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := stderr.Read(buf)
+			if n > 0 {
+				fmt.Printf("[parecord stderr] %s", string(buf[:n]))
+			}
+			if err != nil {
+				break
+			}
+		}
+	}()
+
 	r.active = true
 	return nil
 }

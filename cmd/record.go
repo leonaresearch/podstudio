@@ -40,11 +40,11 @@ This command is designed for accessible podcast production, providing clear feed
 		if !cmd.Flags().Changed("description") {
 			description = viper.GetString("inputdevice.description")
 		}
-		recordingDevice := audio.InputDevice{
-			Card:        card,
-			Device:      device,
-			Description: description,
-		}
+		audioSource := audio.AudioSource{
+			
+
+		// print the selected device
+		fmt.Printf("Selected audio device: %s (Card: %d, Device: %d)\n", recordingDevice.Description, recordingDevice.Card, recordingDevice.Device)
 		recordingSampleRate := viper.GetInt("recording.samplerate")
 		if len(args) > 0 && args[0] == "stop" {
 			err := audio.StopRecording()

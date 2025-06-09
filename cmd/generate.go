@@ -46,15 +46,15 @@ func init() {
 func printAudioInputDevices() {
 	fmt.Println("Available audio input devices:")
 
-	var availableDevices []audio.InputDevice
-	cmd := exec.Command("bash", "-c",
-		`arecord -l | grep "^card" | sed -E 's/card ([0-9]+): ([^,]+), device ([0-9]+): (.+)/{"card":\1,"name":"\2","device":\3,"description":"\4"}/' | jq -s '.'`)
-
+	// Use pactl to get sources in JSON
+	cmd := exec.Command("bash", "-c", "pactl -f json list sources short")
 	output, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Unmarshal JSON into []audio.AudioSource (update AudioSource struct as needed)
+	var availableDevices []audio.AudioSource
 	err = json.Unmarshal(output, &availableDevices)
 	if err != nil {
 		log.Fatal(err)
@@ -67,11 +67,11 @@ func printAudioInputDevices() {
 
 	// Use huh to prompt the user to select a device
 	var selectedName string
-	var selectedDevice audio.InputDevice
+	var selectedDevice audio.AudioSource
 	options := make([]huh.Option[string], len(availableDevices))
-	deviceMap := make(map[string]audio.InputDevice)
+	deviceMap := make(map[string]audio.AudioSource)
 	for i, device := range availableDevices {
-		label := fmt.Sprintf("%s (card %d, device %d) - %s", device.Name, device.Card, device.Device, device.Description)
+		label := fmt.Sprintf("%s (index %d)", device.Name, device.Index)
 		options[i] = huh.NewOption(label, device.Name)
 		deviceMap[device.Name] = device
 	}
@@ -120,9 +120,8 @@ func printAudioInputDevices() {
 
 	// Store device details in config with prefix inputDevice.
 	viper.Set("inputDevice.name", selectedDevice.Name)
-	viper.Set("inputDevice.card", selectedDevice.Card)
-	viper.Set("inputDevice.device", selectedDevice.Device)
-	viper.Set("inputDevice.description", selectedDevice.Description)
+	viper.Set("inputDevice.index", selectedDevice.Index)
+	// If you want to store more info, add more fields from AudioSource as needed
 	viper.Set("recording.sampleRate", selectedSampleRate)
 	viper.Set("recording.format", selectedFormat)
 

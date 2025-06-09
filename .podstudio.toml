@@ -5,5 +5,5 @@ device = 0
 name = 'Device [USB PnP Audio Device]'
 
 [recording]
-format = 'wav'
+format = 'mp3'
 samplerate = 48000

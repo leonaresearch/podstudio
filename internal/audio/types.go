@@ -1,8 +1,9 @@
 package audio
 
-type InputDevice struct {
-	Card        int    `json:"card"`
-	Name        string `json:"name"`
-	Device      int    `json:"device"`
-	Description string `json:"description"`
+type AudioSource struct {
+	Driver              string `json:"driver,omitzero"`
+	Index               int    `json:"index,omitzero"`
+	Name                string `json:"name,omitzero"`
+	SampleSpecification string `json:"sample_specification,omitzero"`
+	State               string `json:"state,omitzero"`
 }
