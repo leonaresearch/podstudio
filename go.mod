@@ -6,6 +6,7 @@ require (
 	github.com/charmbracelet/huh v0.7.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
+	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	gopkg.in/BenLubar/espeak.v2 v2.0.0-20181124182917-97aeeb571327
 )
 

@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -8,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 // startCmd represents the start command
@@ -37,4 +37,25 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func startRecording() (rpio.State, error) {
+	err := rpio.Open()
+
+	if err != nil {
+		fmt.Printf("Error opening GPIO: %v\n", err)
+		return rpio.Low, err
+	}
+
+	pin := rpio.Pin(17)
+
+	pin.Input()
+	res := pin.Read()
+
+	if res == rpio.High {
+		fmt.Println("Starting recording...")
+		// Add the start Recording logic here, e.g., initializing audio recording
+	}
+
+	return res, nil
 }

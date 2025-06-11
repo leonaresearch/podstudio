@@ -33,6 +33,7 @@ func init() {
 	configCmd.AddCommand(generateCmd)
 
 	// Here you will define your flags and configuration settings.
+	//cobra.OnInitialize(printAudioInputDevices)
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
@@ -131,4 +132,23 @@ func printAudioInputDevices() {
 	}
 
 	fmt.Println("Device selection saved to .podstudio.toml")
+}
+func stopRecording() (rpio.State, error) {
+	err := rpio.Open()
+	if err != nil {
+		fmt.Printf("Error opening GPIO: %v\n", err)
+		return rpio.Low, err
+	}
+
+	pin := rpio.Pin(17)
+
+	pin.Input()
+	res := pin.Read()
+
+	if res == rpio.Low {
+		fmt.Println("Stopping recording...")
+		// Add the stop Recording logic here, e.g., finalizing audio recording
+	}
+
+	return res, nil
 }
